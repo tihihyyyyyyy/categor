@@ -90,10 +90,6 @@
       font-size: 0.9rem;
     }
 
-    .btn-clear:hover {
-      background: rgba(239, 68, 68, 0.25);
-    }
-
     .inputs-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -248,28 +244,28 @@
     </header>
 
     <div class="presets">
-      <button type="button" class="btn-preset" id="btnPreset1">🧪 Приклад 1: Похід у гори</button>
-      <button type="button" class="btn-preset" id="btnPreset2">🧪 Приклад 2: Кемпінг</button>
-      <button type="button" class="btn-preset" id="btnPreset3">🧪 Приклад 3: Порожній список</button>
-      <button type="button" class="btn-clear" id="btnClear">🗑️ Очистити поля</button>
+      <button type="button" class="btn-preset" onclick="loadPreset(1)">🧪 Приклад 1: Похід у гори</button>
+      <button type="button" class="btn-preset" onclick="loadPreset(2)">🧪 Приклад 2: Кемпінг</button>
+      <button type="button" class="btn-preset" onclick="loadPreset(3)">🧪 Приклад 3: Порожній список</button>
+      <button type="button" class="btn-clear" onclick="clearAll()">🗑️ Очистити поля</button>
     </div>
 
     <div class="inputs-grid">
       <div class="input-box">
         <label for="listA">Комплект А (Учасник 1 / Базовий)</label>
-        <textarea id="listA" placeholder="Введіть речі через кому або з нового рядка..."></textarea>
+        <textarea id="listA" oninput="compareGear()" placeholder="Введіть речі через кому або з нового рядка..."></textarea>
         <div class="hint">Підтримується введення через кому, крапку з комою або з нового рядка</div>
       </div>
 
       <div class="input-box">
         <label for="listB">Комплект Б (Учасник 2 / Фактичний)</label>
-        <textarea id="listB" placeholder="Введіть речі через кому або з нового рядка..."></textarea>
+        <textarea id="listB" oninput="compareGear()" placeholder="Введіть речі через кому або з нового рядка..."></textarea>
         <div class="hint">Результат оновлюється автоматично під час введення</div>
       </div>
     </div>
 
     <div class="action-bar">
-      <button type="button" class="btn-primary" id="btnCompare">Порівняти комплекти</button>
+      <button type="button" class="btn-primary" onclick="compareGear()">Порівняти комплекти</button>
     </div>
 
     <div class="results-grid">
@@ -309,51 +305,54 @@
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const boxA = document.getElementById("listA");
-      const boxB = document.getElementById("listB");
+    function parseToSet(rawText) {
+      var items = rawText
+        .split(/[\n,;]+/)
+        .map(function(item) { return item.trim().toLowerCase(); })
+        .filter(function(item) { return item.length > 0; });
+      return new Set(items);
+    }
 
-      function parseToSet(rawText) {
-        const items = rawText
-          .split(/[\n,;]+/)
-          .map(item => item.trim().toLowerCase())
-          .filter(item => item.length > 0);
-        return new Set(items);
+    function renderTags(containerId, countId, itemsArray, tagClass) {
+      var container = document.getElementById(containerId);
+      var badge = document.getElementById(countId);
+      badge.textContent = itemsArray.length;
+      container.innerHTML = "";
+
+      if (itemsArray.length === 0) {
+        container.innerHTML = '<span class="empty-msg">Немає елементів</span>';
+        return;
       }
 
-      function renderTags(containerId, countId, itemsArray, tagClass) {
-        const container = document.getElementById(containerId);
-        const badge = document.getElementById(countId);
-        badge.textContent = itemsArray.length;
-        container.innerHTML = "";
+      itemsArray.forEach(function(item) {
+        var span = document.createElement("span");
+        span.className = "tag " + tagClass;
+        span.textContent = item;
+        container.appendChild(span);
+      });
+    }
 
-        if (itemsArray.length === 0) {
-          container.innerHTML = '<span class="empty-msg">Немає елементів</span>';
-          return;
-        }
+    function compareGear() {
+      var boxA = document.getElementById("listA");
+      var boxB = document.getElementById("listB");
+      var setA = parseToSet(boxA.value);
+      var setB = parseToSet(boxB.value);
 
-        itemsArray.forEach(item => {
-          const span = document.createElement("span");
-          span.className = `tag ${tagClass}`;
-          span.textContent = item;
-          container.appendChild(span);
-        });
-      }
+      var arrA = Array.from(setA);
+      var arrB = Array.from(setB);
 
-      function compareGear() {
-        const setA = parseToSet(boxA.value);
-        const setB = parseToSet(boxB.value);
+      var common = arrA.filter(function(x) { return setB.has(x); }).sort();
+      var onlyA = arrA.filter(function(x) { return !setB.has(x); }).sort();
+      var onlyB = arrB.filter(function(x) { return !setA.has(x); }).sort();
+      var allUnique = Array.from(new Set(arrA.concat(arrB))).sort();
 
-        const common = [...setA].filter(x => setB.has(x)).sort((a, b) => a.localeCompare(b, 'uk'));
-        const onlyA = [...setA].filter(x => !setB.has(x)).sort((a, b) => a.localeCompare(b, 'uk'));
-        const onlyB = [...setB].filter(x => !setA.has(x)).sort((a, b) => a.localeCompare(b, 'uk'));
-        const allUnique = [...new Set([...setA, ...setB])].sort((a, b) => a.localeCompare(b, 'uk'));
+      renderTags("resCommon", "countCommon", common, "tag-common");
+      renderTags("resOnlyA", "countOnlyA", onlyA, "tag-a");
+      renderTags("resOnlyB", "countOnlyB", onlyB, "tag-b");
+      renderTags("resAll", "countAll", allUnique, "tag-all");
+    }
 
-        renderTags("resCommon", "countCommon", common, "tag-common");
-        renderTags("resOnlyA", "countOnlyA", onlyA, "tag-a");
-        renderTags("resOnlyB", "countOnlyB", onlyB, "tag-b");
-        renderTags("resAll", "countAll", allUnique, "tag-all");
-      }
+    function loadPreset(num) {
+      var boxA = document.getElementById("listA");
+      var boxB = document.getElementById("listB");
 
-      function loadPreset(num) {
-        if (num === 1) {
