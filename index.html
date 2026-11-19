@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Порівняння комплектів спорядження</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --green: #10b981;
+      --purple: #a855f7;
+      --orange: #f59e0b;
+      --red: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+    }
+
+    header p {
+      color: var(--muted);
+    }
+
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .btn-preset {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    .btn-preset:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-clear {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    .btn-clear:hover {
+      background: rgba(239, 68, 68, 0.25);
+    }
+
+    .inputs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .input-box {
+      background: var(--card);
+      padding: 1.25rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .input-box label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+    }
+
+    textarea {
+      width: 100%;
+      height: 130px;
+      background: #0f172a;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      resize: vertical;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.4rem;
+    }
+
+    .action-bar {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0f172a;
+      padding: 0.85rem 2.5rem;
+      font-size: 1.05rem;
+      box-shadow: 0 4px 14px rgba(56, 189, 248, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      color: #fff;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .result-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+
+    .result-card h3 {
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .badge {
+      font-size: 0.8rem;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      background: #334155;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .tag {
+      padding: 0.25rem 0.65rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .tag-common { background: rgba(16, 185, 129, 0.15); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .tag-a { background: rgba(56, 189, 248, 0.15); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.3); }
+    .tag-b { background: rgba(168, 85, 247, 0.15); color: var(--purple); border: 1px solid rgba(168, 85, 247, 0.3); }
+    .tag-all { background: rgba(245, 158, 11, 0.15); color: var(--orange); border: 1px solid rgba(245, 158, 11, 0.3); }
+
+    .empty-msg {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+
+    .limitations {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+
+    .limitations h3 {
+      color: var(--orange);
+      margin-bottom: 0.5rem;
+      font-size: 1.05rem;
+    }
+
+    .limitations ul {
+      padding-left: 1.25rem;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .limitations li {
+      margin-bottom: 0.3rem;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎒 Порівняння комплектів спорядження</h1>
+      <p>Інструмент для організатора: швидко знаходьте дублікати та унікальні речі у списках</p>
+    </header>
+
+    <div class="presets">
+      <button type="button" class="btn-preset" id="btnPreset1">🧪 Приклад 1: Похід у гори</button>
+      <button type="button" class="btn-preset" id="btnPreset2">🧪 Приклад 2: Кемпінг</button>
+      <button type="button" class="btn-preset" id="btnPreset3">🧪 Приклад 3: Порожній список</button>
+      <button type="button" class="btn-clear" id="btnClear">🗑️ Очистити поля</button>
+    </div>
+
+    <div class="inputs-grid">
+      <div class="input-box">
+        <label for="listA">Комплект А (Учасник 1 / Базовий)</label>
+        <textarea id="listA" placeholder="Введіть речі через кому або з нового рядка..."></textarea>
+        <div class="hint">Підтримується введення через кому, крапку з комою або з нового рядка</div>
+      </div>
+
+      <div class="input-box">
+        <label for="listB">Комплект Б (Учасник 2 / Фактичний)</label>
+        <textarea id="listB" placeholder="Введіть речі через кому або з нового рядка..."></textarea>
+        <div class="hint">Результат оновлюється автоматично під час введення</div>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <button type="button" class="btn-primary" id="btnCompare">Порівняти комплекти</button>
+    </div>
+
+    <div class="results-grid">
+      <div class="result-card">
+        <h3>🤝 Спільне (A & B) <span class="badge" id="countCommon">0</span></h3>
+        <div class="tags" id="resCommon"></div>
+      </div>
+
+      <div class="result-card">
+        <h3>🔹 Лише в А (A - B) <span class="badge" id="countOnlyA">0</span></h3>
+        <div class="tags" id="resOnlyA"></div>
+      </div>
+
+      <div class="result-card">
+        <h3>🔸 Лише в Б (B - A) <span class="badge" id="countOnlyB">0</span></h3>
+        <div class="tags" id="resOnlyB"></div>
+      </div>
+
+      <div class="result-card">
+        <h3>📦 Усі унікальні (A | B) <span class="badge" id="countAll">0</span></h3>
+        <div class="tags" id="resAll"></div>
+      </div>
+    </div>
+
+    <section class="limitations">
+      <h3>⚠️ Обмеження алгоритму (на основі множин Set)</h3>
+      <ul>
+        <li><strong>Не враховує кількість:</strong> якщо в списку вказано «ліхтарик» двічі, множина збереже лише один екземпляр.</li>
+        <li><strong>Чутливість до формулювань:</strong> слова <em>«спальник»</em> та <em>«спальний мішок»</em> система вважатиме двома різними предметами.</li>
+        <li><strong>Відсутність початкового порядку:</strong> елементи множини не зберігають черговість введення, тому для зручності читання результат відсортовано за алфавітом.</li>
+      </ul>
+    </section>
+
+    <footer>
+      Створено на базі операцій над множинами (Set) • Готово до публікації на GitHub Pages
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const boxA = document.getElementById("listA");
+      const boxB = document.getElementById("listB");
+
+      function parseToSet(rawText) {
+        const items = rawText
+          .split(/[\n,;]+/)
+          .map(item => item.trim().toLowerCase())
+          .filter(item => item.length > 0);
+        return new Set(items);
+      }
+
+      function renderTags(containerId, countId, itemsArray, tagClass) {
+        const container = document.getElementById(containerId);
+        const badge = document.getElementById(countId);
+        badge.textContent = itemsArray.length;
+        container.innerHTML = "";
+
+        if (itemsArray.length === 0) {
+          container.innerHTML = '<span class="empty-msg">Немає елементів</span>';
+          return;
+        }
+
+        itemsArray.forEach(item => {
+          const span = document.createElement("span");
+          span.className = `tag ${tagClass}`;
+          span.textContent = item;
+          container.appendChild(span);
+        });
+      }
+
+      function compareGear() {
+        const setA = parseToSet(boxA.value);
+        const setB = parseToSet(boxB.value);
+
+        const common = [...setA].filter(x => setB.has(x)).sort((a, b) => a.localeCompare(b, 'uk'));
+        const onlyA = [...setA].filter(x => !setB.has(x)).sort((a, b) => a.localeCompare(b, 'uk'));
+        const onlyB = [...setB].filter(x => !setA.has(x)).sort((a, b) => a.localeCompare(b, 'uk'));
+        const allUnique = [...new Set([...setA, ...setB])].sort((a, b) => a.localeCompare(b, 'uk'));
+
+        renderTags("resCommon", "countCommon", common, "tag-common");
+        renderTags("resOnlyA", "countOnlyA", onlyA, "tag-a");
+        renderTags("resOnlyB", "countOnlyB", onlyB, "tag-b");
+        renderTags("resAll", "countAll", allUnique, "tag-all");
+      }
+
+      function loadPreset(num) {
+        if (num === 1) {
